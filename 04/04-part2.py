@@ -2,47 +2,43 @@
 
 import re
 import string
-from collections import Counter
 
-def rotate(myList, n):
 
-	if n > len(myList):
-		n = n % len(myList)
+def rotate(my_list, n):
+    if n > len(my_list):
+        n = n % len(my_list)
 
-	return myList[n:] + myList[:n]
+    return my_list[n:] + my_list[:n]
+
 
 def main():
+    with open("input.txt", 'r') as f:
+        lines = f.readlines()
 
-	with open("input.txt",'r') as f:
-		lines = f.readlines()
+    # Sample line:
+    # qzmt-zixmtkozy-ivhz-343
+    for line in lines:
+        parsed_line = re.sub('-', ' ', line)
+        parsed_line = re.split(r'(\d+)', parsed_line)
+        parsed_line[-1] = parsed_line[-1].strip('[]\n')
 
-	sector_id_sum = 0
+        encrypted = parsed_line[0]
+        sector_id = int(parsed_line[1])
 
-	# Sample line:
-	# qzmt-zixmtkozy-ivhz-343
-	for line in lines:
-		parsed_line = re.sub('-',' ',line)
-		parsed_line = re.split('(\d+)', parsed_line)
-		parsed_line[-1] = parsed_line[-1].strip('[]\n')
+        alphs = list(string.ascii_lowercase)
+        newalphs = rotate(alphs, sector_id)
 
-		encrypted = parsed_line[0]
-		sector_id = int(parsed_line[1])
-		checksum = parsed_line[2]
+        cipher = dict(zip(alphs, newalphs))
 
-		alphs = list(string.ascii_lowercase)
-		newalphs = rotate(alphs,sector_id)
+        real = ''
+        for c in encrypted:
+            if c == ' ':
+                real += c
+            else:
+                real += cipher[c]
 
-		cipher = dict(zip(alphs,newalphs))
-
-		real = ''
-		for c in encrypted:
-			if c == ' ':
-				real += c
-			else:
-				real += cipher[c]
-
-		if re.search('north', real):
-			print real, sector_id
+        if re.search('north', real):
+            print real, sector_id
 
 if __name__ == "__main__":
     main()
